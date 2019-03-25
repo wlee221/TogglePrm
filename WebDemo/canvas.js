@@ -6,7 +6,6 @@ var black = 'rgb(0,0,0)'
 var white = 'rgb(255,255,255)'
 
 var canvas = document.getElementById('workspace');
-//if (canvas.getContext) {}
 var ctx = canvas.getContext('2d');
 ctx.fillstyle = black;
 
@@ -29,7 +28,6 @@ canvas.addEventListener('mousedown', function(e){
     ctx.moveTo(mouse.x, mouse.y);
     start.x = mouse.x;
     start.y = mouse.y;
-    console.log(start);
     canvas.addEventListener('mousemove', onPaint, false);
 }, false);
 
@@ -52,13 +50,11 @@ function startCanvas() {
     ctx.beginPath();
     ctx.arc(25, canvas.height - 25, 4, 0, 2 * Math.PI);
     ctx.fillStyle = "blue";
-    ctx.stroke();
     ctx.fill();
 
     ctx.beginPath();
     ctx.arc(canvas.width - 25, 25, 4, 0, 2 * Math.PI);
     ctx.fillStyle = "green";
-    ctx.stroke();
     ctx.fill();
 }
 
