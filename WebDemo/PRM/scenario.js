@@ -28,7 +28,7 @@ Scenario.prototype.getRGBA = function(x, y) {
     return rgba;
 }
 
-Scenario.prototype.valid = function(p, toggle = false) {
+Scenario.prototype.valid = function(p) {
     var rgba = this.getRGBA(Math.round(p.x), Math.round(p.y));
     var r = rgba[0];
     var g = rgba[1];
@@ -40,7 +40,7 @@ Scenario.prototype.valid = function(p, toggle = false) {
         return valid;
 }
 
-Scenario.prototype.link = function(p, q, toggle = false) {
+Scenario.prototype.link = function(p, q) {
     if (!this.valid(p, toggle) || !this.valid(q, toggle))
         return false;
     return this.bisect(p, q);
