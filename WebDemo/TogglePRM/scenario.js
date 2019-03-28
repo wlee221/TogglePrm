@@ -43,18 +43,18 @@ Scenario.prototype.valid = function(p, toggle = false) {
 Scenario.prototype.link = function(p, q, toggle = false) {
     if (!this.valid(p, toggle) || !this.valid(q, toggle))
         return false;
-    return this.bisect(p, q);
+    return this.bisect(p, q, toggle);
 }
 
-Scenario.prototype.bisect = function(p, q) {
+Scenario.prototype.bisect = function(p, q, toggle = false) {
     var mid = new Point((p.x + q.x) / 2, (p.y + q.y) / 2);
     var distSquared = distsq(p, q)
     var tol = 0.5;
     if (distSquared < tol * tol)
         return true;
-    if (!this.valid(mid))
+    if (!this.valid(mid, toggle))
         return false;
-    if (!this.bisect(p, mid))
+    if (!this.bisect(p, mid, toggle))
         return false;
-    return this.bisect(mid, q);
+    return this.bisect(mid, q, toggle);
 }

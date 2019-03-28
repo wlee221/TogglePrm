@@ -1,5 +1,5 @@
 /* 
- * Implementation of toggle prm
+ * Implementation of prm
  *
  * Author: William Lee
  */
@@ -123,7 +123,7 @@ Connector.prototype.knearest = function(graph, idx) {
     return arr.slice(0, k);
 }
 
-Connector.prototype.connect = function(graph, toggle) {
+Connector.prototype.connect = function(graph) {
     for (var i = 0; i < graph.vertex.length; i++) 
         if (graph.edges[i] == null) 
             graph.edges[i] = [];
@@ -175,7 +175,6 @@ function growRoadmap() {
         Gfree.addVertex(new Point(25, 475));
         Gfree.addVertex(new Point(775, 25));
     }
-    toggle = false; // if toggle is false, explore free space. Else explore obst space.
     for (var i = 0; i < 15; ++i) {
         var node = sampler.sample();
         if (c.scenario.valid(node)) {
