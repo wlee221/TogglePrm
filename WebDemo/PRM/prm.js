@@ -164,9 +164,6 @@ var Gfree = new Graph();
 var Gobst = new Graph();
 
 var sampler = new UniformSampler();
-//var q = new Queue();
-var done = false;
-
 var c = null;
 
 function growRoadmap() {
