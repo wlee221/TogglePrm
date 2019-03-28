@@ -34,14 +34,11 @@ Scenario.prototype.valid = function(p) {
     var g = rgba[1];
     var b = rgba[2];
     var valid = !(Math.abs(r - 25) < 5 && Math.abs(g - 25) < 5 && Math.abs(b - 25) < 5); // test for approximate values to account for antialiasing
-    if (toggle)
-        return !valid;
-    else
-        return valid;
+    return valid;
 }
 
 Scenario.prototype.link = function(p, q) {
-    if (!this.valid(p, toggle) || !this.valid(q, toggle))
+    if (!this.valid(p) || !this.valid(q))
         return false;
     return this.bisect(p, q);
 }
