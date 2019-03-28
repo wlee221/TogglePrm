@@ -37,10 +37,7 @@ Graph.prototype.addVertex = function(p) {
 Graph.prototype.draw = function(c) {
     var canvas = document.getElementById('workspace');
     var ctx = canvas.getContext('2d');
-    if (c != null) {
-        s = c.scenario;
-        ctx.putImageData(s.imageData, 0, 0);
-    }
+
     for (var i = 0; i < this.vertex.length; i++) {
         p = this.vertex[i];
         ctx.beginPath();
@@ -59,9 +56,9 @@ Graph.prototype.draw = function(c) {
             ctx.lineTo(to.x, to.y);
             ctx.lineWidth=0.5;
             ctx.stroke();
-            
         }
     }
+
 
     ctx.beginPath();
     ctx.arc(25, canvas.height - 25, 4, 0, 2 * Math.PI);
@@ -86,8 +83,9 @@ function Connector(scenario) {
 // naive approach of k-nearest neighbor of vertex[idx], O(kn) using fixed size insertion sort
 Connector.prototype.knearest = function(graph, idx) {
     arr = [];
-    //console.log("finding k nearest neighbors for point", pt);
     var pt = graph.vertex[idx];
+    //console.log("finding k nearest neighbors for point", pt);
+    //console.log(graph.vertex.length);
 
     for (var i = 0; i < graph.vertex.length; i++) {
         var p = graph.vertex[i];
@@ -99,7 +97,7 @@ Connector.prototype.knearest = function(graph, idx) {
         } else {
             arr[k] = i;
         }
-
+        //console.log(arr);
         // sort arr using insertion sort
         for ( var j = arr.length - 1; j > 0; j--) {
             point_j = graph.vertex[arr[j]];
@@ -110,20 +108,20 @@ Connector.prototype.knearest = function(graph, idx) {
                 break;
             }
         }
-        /*
+/*
         var str ="[ ";
         for (var tmp = 0; tmp < arr.length; tmp++) {
             str = str + distsq(pt, graph.vertex[arr[tmp]]) + " ";
         }
         str = str + "]";
         console.log(str)
-        */
+       */ 
 
     }
     return arr.slice(0, k);
 }
 
-Connector.prototype.connect = function(graph, toggle) {
+Connector.prototype.connect = function(graph, toggle, witness) {
     for (var i = 0; i < graph.vertex.length; i++) 
         if (graph.edges[i] == null) 
             graph.edges[i] = [];
@@ -132,7 +130,7 @@ Connector.prototype.connect = function(graph, toggle) {
         for (var j = 0; j < knearest.length; j++) {
             var from = graph.vertex[i];
             var to = graph.vertex[knearest[j]];
-            if (this.scenario.link(from, to)){ 
+            if (this.scenario.link(from, to, toggle, witness)){ 
                 if (!graph.edges[i].includes(knearest[j])){
                     graph.edges[i].push(knearest[j]);
                 }                
@@ -166,24 +164,56 @@ var Gobst = new Graph();
 var sampler = new UniformSampler();
 //var q = new Queue();
 var done = false;
-
 var c = null;
 
 function growRoadmap() {
+
+    var canvas = document.getElementById('workspace');
+    var ctx = canvas.getContext('2d');
+    if (c != null) {
+        s = c.scenario;
+        ctx.putImageData(s.imageData, 0, 0);
+    }
+
     if (c == null) {
         c = new Connector(new Scenario());
         Gfree.addVertex(new Point(25, 475));
         Gfree.addVertex(new Point(775, 25));
     }
-    toggle = false; // if toggle is false, explore free space. Else explore obst space.
-    for (var i = 0; i < 15; ++i) {
-        var node = sampler.sample();
-        if (c.scenario.valid(node)) {
+
+    var toggle = false; // if toggle is false, explore free space. Else explore obst space.
+
+    var q = new Queue();
+    for (var i = 0; i < 5; ++i) {
+        q.add(sampler.sample());
+    }
+
+    for (var i = 0; i < 25; ++i) {
+
+        if (q.empty()) break;
+
+        var node = q.pop();
+        if (c.scenario.valid(node, toggle)) {
             Gfree.addVertex(node);
+            var collisionNodes = [];
+            c.connect(Gfree, toggle, collisionNodes);
+            //console.log(collisionNodes);
+            for (var j = 0; j < collisionNodes.length; ++j)
+                q.add(collisionNodes[j]);
+        } else {
+            toggle = !toggle;
+            Gobst.addVertex(node);
+            var validNodes = [];
+            c.connect(Gobst, toggle, validNodes);
+            for (var j = 0; j < validNodes.length; ++j) {
+                q.add(validNodes[j]);
+            }
+            toggle = !toggle;
         }
     }
-    c.connect(Gfree)
+    
     Gfree.draw(c);
+    Gobst.draw(c);
     shortestPath(Gfree);
 }
 

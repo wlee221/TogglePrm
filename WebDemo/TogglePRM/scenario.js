@@ -28,7 +28,7 @@ Scenario.prototype.getRGBA = function(x, y) {
     return rgba;
 }
 
-Scenario.prototype.valid = function(p, toggle = false) {
+Scenario.prototype.valid = function(p, toggle) {
     var rgba = this.getRGBA(Math.round(p.x), Math.round(p.y));
     var r = rgba[0];
     var g = rgba[1];
@@ -40,21 +40,17 @@ Scenario.prototype.valid = function(p, toggle = false) {
         return valid;
 }
 
-Scenario.prototype.link = function(p, q, toggle = false) {
-    if (!this.valid(p, toggle) || !this.valid(q, toggle))
-        return false;
-    return this.bisect(p, q, toggle);
-}
-
-Scenario.prototype.bisect = function(p, q, toggle = false) {
+Scenario.prototype.link = function(p, q, toggle, witness) {
     var mid = new Point((p.x + q.x) / 2, (p.y + q.y) / 2);
     var distSquared = distsq(p, q)
     var tol = 0.5;
     if (distSquared < tol * tol)
         return true;
-    if (!this.valid(mid, toggle))
+    if (!this.valid(mid, toggle)){
+        witness.push(mid);
         return false;
-    if (!this.bisect(p, mid, toggle))
+    }
+    if (!this.link(p, mid, toggle, witness))
         return false;
-    return this.bisect(mid, q, toggle);
+    return this.link(mid, q, toggle, witness);
 }
