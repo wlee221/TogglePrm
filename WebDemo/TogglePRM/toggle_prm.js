@@ -100,7 +100,7 @@ Graph.prototype.draw = function(c) {
 // Connector
 
 // settings
-var k = 5; // k nearest neighbors
+var k = 3; // k nearest neighbors
 var n = 10; // number of samples per iteration
 
 function Connector(scenario) {
@@ -108,9 +108,9 @@ function Connector(scenario) {
 }
 
 function penalizedDist(graph, i, j) {
-    var dist =  distsq(graph.vertex[i], graph.vertex[j]);
+    var dist = distsq(graph.vertex[i], graph.vertex[j]);
     if(graph.getComponentIdx(i) != graph.getComponentIdx(j))
-        return dist/16;
+        return dist/4;
     else 
         return dist;
 }

@@ -28,10 +28,37 @@ Queue.prototype.empty = function() {
 function Graph() {
     this.vertex = [];
     this.edges = [];
+    this.cc = []; //connected components
 }
 
 Graph.prototype.addVertex = function(p) {
     this.vertex.push(p);
+    this.edges[this.vertex.length - 1] = [];
+    this.cc.push([this.vertex.length - 1]);
+}
+
+Graph.prototype.addEdge = function(i, j) {
+    if (!this.edges[i].includes(j))
+        this.edges[i].push(j);
+    
+    if (!this.edges[j].includes(i))
+        this.edges[j].push(i);
+    var component_i = this.getComponentIdx(i);
+    var component_j = this.getComponentIdx(j);
+    if (component_i != component_j){
+        // combine components
+        this.cc[component_i] = this.cc[component_i].concat(this.cc[component_j]);
+        this.cc.splice(component_j, 1);
+    }
+    
+}
+Graph.prototype.getComponentIdx = function(i) {
+    var component_i;
+    for (component_i = 0; component_i < this.cc.length; component_i++) {
+        if (this.cc[component_i].includes(i))
+            return component_i;
+    }    
+    console.log("Error: Out of bounds");
 }
 
 Graph.prototype.draw = function(c) {
@@ -83,6 +110,16 @@ function Connector(scenario) {
     this.scenario = scenario;
 }
 
+
+function penalizedDist(graph, i, j) {
+    var dist =  distsq(graph.vertex[i], graph.vertex[j]);
+    if(graph.getComponentIdx(i) != graph.getComponentIdx(j))
+        return dist/16;
+    else 
+        return dist;
+}
+
+
 // naive approach of k-nearest neighbor of vertex[idx], O(kn) using fixed size insertion sort
 Connector.prototype.knearest = function(graph, idx) {
     arr = [];
@@ -102,9 +139,7 @@ Connector.prototype.knearest = function(graph, idx) {
 
         // sort arr using insertion sort
         for ( var j = arr.length - 1; j > 0; j--) {
-            point_j = graph.vertex[arr[j]];
-            point_jm1 = graph.vertex[arr[j-1]];
-            if (distsq(pt, point_j) < distsq(pt, point_jm1)) {
+            if (penalizedDist(graph, idx, arr[j]) < penalizedDist(graph, idx, arr[j - 1])) {
                 [arr[j-1], arr[j]] = [arr[j], arr[j-1]];
             } else {
                 break;
@@ -132,13 +167,8 @@ Connector.prototype.connect = function(graph) {
         for (var j = 0; j < knearest.length; j++) {
             var from = graph.vertex[i];
             var to = graph.vertex[knearest[j]];
-            if (this.scenario.link(from, to)){ 
-                if (!graph.edges[i].includes(knearest[j])){
-                    graph.edges[i].push(knearest[j]);
-                }                
-                if (!graph.edges[knearest[j]].includes(i)){
-                    graph.edges[knearest[j]].push(i);
-                }
+            if (this.scenario.link(from, to)) { 
+                graph.addEdge(i, knearest[j]);
             }
         }
     }
