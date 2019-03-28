@@ -1,29 +1,23 @@
 /*
- * Todo: complete path check box (line mode)
+ * Author: William Lee
  */
-// Colors
-var black = 'rgb(0,0,0)'
-var white = 'rgb(255,255,255)'
 
+var fillPath = true;
 var canvas = document.getElementById('workspace');
 var ctx = canvas.getContext('2d');
-ctx.fillstyle = black;
 
 startCanvas();
 
 var mouse = {x : 0, y : 0};
 var start = {x : 0, y : 0};
+
 canvas.addEventListener('mousemove', function(e) {
     mouse.x = e.pageX - this.offsetLeft;
     mouse.y = e.pageY - this.offsetTop;
 }, false);
 
-ctx.lineWidth = 3;
-ctx.lineJoin = 'round';
-ctx.lineCap = 'round';
-ctx.strokeStyle = '#00CC99';
-
 canvas.addEventListener('mousedown', function(e){
+    // console.log(mouse.x, mouse.y);
     ctx.beginPath();
     ctx.moveTo(mouse.x, mouse.y);
     start.x = mouse.x;
@@ -32,14 +26,18 @@ canvas.addEventListener('mousedown', function(e){
 }, false);
 
 canvas.addEventListener('mouseup', function() {
-    ctx.lineTo(start.x, start.y);
-    ctx.stroke();
-    ctx.fillStyle = '#00CC99';
-    ctx.fill();
+    if (fillPath) {
+        ctx.lineWidth = 3;
+        ctx.lineTo(start.x, start.y);
+        ctx.fillStyle = 'rgb(25, 25, 25)';
+        ctx.fill();
+    }
     canvas.removeEventListener('mousemove', onPaint, false);
 }, false);
 
 var onPaint = function() {
+    ctx.strokeStyle = "rgb(25, 25, 25)";
+    ctx.lineWidth = 2;
     ctx.lineTo(mouse.x, mouse.y);
     ctx.stroke();
 };
@@ -59,9 +57,18 @@ function startCanvas() {
 }
 
 function clearCanvas() {
+    Gfree = new Graph();
+    Gobst = new Graph();
+    c = null;
     startCanvas();
 }
 
-function toggleDraw() {
-
+function fillPathCheckbox() {
+    var checkBox = document.getElementById("fill");
+    var el = document.getElementById("fill")
+    if (checkBox.checked)
+        fillPath = true;
+    else
+        fillPath = false;
 }
+

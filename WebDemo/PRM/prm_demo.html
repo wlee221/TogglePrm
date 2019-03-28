@@ -5,7 +5,9 @@
 </head>
 <body>
     <h1>PRM Demo</h1>
-    <button onclick="toggleDraw()">Draw</button> <button onclick="clearCanvas()">Reset</button> <br> <br>
+    Fill path: <input type="checkbox" id="fill" onclick="fillPathCheckbox()" checked> <br>
+    <button onclick="growRoadmap()">Grow Roadmap</button> 
+    <button onclick="clearCanvas()">Reset</button> <br> 
     <canvas id="workspace" width="800" height="500"></canvas>
     <style type="text/css">
         canvas { border: 1px solid black; }
